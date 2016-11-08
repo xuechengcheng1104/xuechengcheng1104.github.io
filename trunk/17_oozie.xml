@@ -1,0 +1,43 @@
+﻿
+#----------------------------------------------------------------------------------------------------
+>>    workflow-app
+<workflow-app xmlns="uri:oozie:workflow:0.3" name="xt-cfb-ods-8-wf">
+	<start to="import_workday_table"/>
+	<!-- 1 -->
+	<!-- retry 必须相对于 uri:oozie:workflow:0.3" -->
+	<action name="import_workday_table" retry-max="2" retry-interval="1">
+		<shell xmlnx="uri:oozie:shell-action:0.2">
+			<job-tracker>${jobtracker_address}</job-tracker>
+			<name-node>${namenode_address}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${mapred_job_queue_name}</value>
+				</property>
+			</configuration>
+			<exec>import_workday_table.sh</exec>
+			<arguement>${tdw_db_url}</arguement>
+			<arguement>${tdw_db_username}</arguement>
+			<arguement>${tdw_db_password}</arguement>
+			<arguement>${nominal_date}</arguement>
+			<arguement>${end_date}</arguement>
+			<file>shell/import_workday_table.sh#import_workday_table.sh</file>
+		</shell>
+		<ok to="export_workday_table" />
+		<error to="fail" />
+	</action>
+	<!-- 2 -->
+	<action>
+		<shell>
+			...
+		</shell>
+		<ok to="end" />
+		<error to="fail" />
+	</action>
+	<kill name="faile">
+		<message>...</message>
+	</kill>
+	<end name="end" />
+</workflow-app>
+#----------------------------------------------------------------------------------------------------
+>>    coordinator-app
