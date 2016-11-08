@@ -48,6 +48,8 @@ http://www.runoob.com/regexp/regexp-syntax.html
 http://www.tldp.org/guides.html
 >> gnu软件手册
 http://www.gnu.org/manual/manual.html
+>> git手册
+http://www.open-open.com/lib/view/open1328069609436.html
 ##################################################
 #      衣服尺寸
 ##################################################
