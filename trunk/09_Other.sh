@@ -50,6 +50,8 @@ http://www.tldp.org/guides.html
 http://www.gnu.org/manual/manual.html
 >> git手册
 http://www.open-open.com/lib/view/open1328069609436.html
+>> 教程
+http://www.w3school.com.cn/
 ##################################################
 #      衣服尺寸
 ##################################################
