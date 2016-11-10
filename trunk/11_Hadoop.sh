@@ -5,10 +5,11 @@ hadoop fs -ls -R /
 hadoop fs -rmr /user/hive/warehouse/xt_cfbdm_safe.db/employees07/
 hdfs dfsadmin -report
 ##################################################
-#    File translate between hdfs and unix FS
+#    copy file
 ##################################################
 hadoop fs -copyToLocal /user/hive/warehouse/xt_cfbdm_safe.db/employees07/country=CHINA/state=HK/input.q /app/document/output.q
 hadoop fs -copyFromLocal /app/document/input.q /user/xcc/input/input.q
+hadoop fs -cp filepath1 filepath2
 ##################################################
 #     deal with filewalld
 ##################################################
@@ -79,31 +80,31 @@ vi hadoop/etc/hadoop/core-site.xml
 	  <name>fs.default.name</name>
 	  <value>hdfs://master:9000</value>
 	</property>
-	<property> 
-	  <name>dfs.name.dir</name>           
-	  <value>/hadoop/name</value> 
+	<property>
+	  <name>dfs.name.dir</name>
+	  <value>/hadoop/name</value>
 	</property>
 vi hadoop/etc/hadoop/hdfs-site.xml
 	<property>
-	    <name>dfs.replication</name>  
+	    <name>dfs.replication</name>
 	    <value>3</value>
 	</property>
 	<property>
-	    <name>dfs.data.dir</name>  
+	    <name>dfs.data.dir</name>
 	    <value>/hadoop/data</value>
 	</property>
 cp hadoop/etc/hadoop/mapred-site.xml.template hadoop/etc/hadoop/mapred-site.xml
 vi hadoop/etc/hadoop/mapred-site.xml
 	<property>
-	    <name>mapred.job.tracker</name>  
+	    <name>mapred.job.tracker</name>
 	    <value>master:9001</value>
 	</property>
 	<property>
-	    <name>mapred.system.dir</name>  
+	    <name>mapred.system.dir</name>
 	    <value>/hadoop/mapred_system</value>
 	</property>
 	<property>
-	    <name>mapred.local.dir</name>  
+	    <name>mapred.local.dir</name>
 	    <value>/hadoop/mapred_local</value>
 	</property>
 vi hadoop/etc/hadoop/masters
