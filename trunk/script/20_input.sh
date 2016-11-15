@@ -1,1 +1,3 @@
-﻿
+﻿root       3210   3085  0 19:32 pts/2    00:00:00 bash /opt/spark-2.0.1-bin-hadoop2.6//bin/spark-shell
+root       3214   3210  1 19:32 pts/2    00:01:56 /opt/java/bin/java -cp /opt/spark-2.0.1-bin-hadoop2.6//conf/:/opt/spark-2.0.1-bin-hadoop2.6/jars/* -Dscala.usejavacp=true -Xmx1g -XX:MaxPermSize=256m org.apache.spark.deploy.SparkSubmit --class org.apache.spark.repl.Main --name Spark shell spark-shell
+root       4043   4022  0 21:47 pts/0    00:00:00 grep --color=auto spark
