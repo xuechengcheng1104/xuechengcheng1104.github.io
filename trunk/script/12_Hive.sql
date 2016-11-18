@@ -1,19 +1,26 @@
 ﻿
-##################################################
-#    解析json字段
-##################################################
+--##################################################
+--#    查看表信息
+--##################################################
+SHOW PARTITIONS employees03;
+SHOW CREATE TABLE l_cust_basic_info;
+describe formatted xt_cfbdm_safe.l_cust_basic_info; --创建时间，修改时间
+describe formatted xt_cfbdm_safe.l_cust_basic_info partition (elt_dt=date'2016-11-16'); --表中记录条数及表物理存储大小
+--##################################################
+--#    解析json字段
+--##################################################
 select get_json_object(tablename.columnname, '$.jsoncolumnname') from tablename;
-##################################################
-#    删除字段
-##################################################
+--##################################################
+--#    删除字段
+--##################################################
 alter table product_analysis_weekly replace columns
 (
 	month_no string comment '...',
 	week_no string comment '...'
 );
-##################################################
-#    增加字段
-##################################################
+--##################################################
+--#    增加字段
+--##################################################
 --先use目标库，表名不可前缀库名
 use xt_trapp_safe;
 alter table product_analysis_weekly add columns
@@ -22,24 +29,24 @@ alter table product_analysis_weekly add columns
 	offline_standard_amt string comment '...',
 	total_standard_amt string comment '...'
 );
-##################################################
-#    hive 命令行接口不能输入制表符，先转制表符为空格。
-##################################################
-##################################################
-#    报错：  <EOF>
-##################################################
+--##################################################
+--#    hive 命令行接口不能输入制表符，先转制表符为空格。
+--##################################################
+--##################################################
+--#    报错：  <EOF>
+--##################################################
 注释语句里不能出现分好";"
-##################################################
-#    报错：  arrayindexoutofboundsexception
-##################################################
+--##################################################
+--#    报错：  arrayindexoutofboundsexception
+--##################################################
 使用临时表存放中间数据，避免单个语句逻辑过于复杂。
-##################################################
-#    时间（带小数点）以字符串存储，转换为 timestamp
-##################################################
+--##################################################
+--#    时间（带小数点）以字符串存储，转换为 timestamp
+--##################################################
 cast(LCD, as timestamp)
-##################################################
-#    hive实现增量更新
-##################################################
+--##################################################
+--#    hive实现增量更新
+--##################################################
 create table customer_temp like customer;
 insert overwrite table customer
 select * from customer_temp
@@ -49,66 +56,51 @@ from customer a
 left outer join customer_temp b
 	on a.id = b.id 
 where b.id is null
-##################################################
-#    hive 变量
-##################################################
+--##################################################
+--#    hive 变量
+--##################################################
 set hivevar:txdate=2016-10-24
-##################################################
-#    hive 数据类型
-##################################################
+--##################################################
+--#    hive 数据类型
+--##################################################
 int
 float
 decimal(22, 2)
 string
 date
 timestamp
-##################################################
-#    hive to_date()
-##################################################
+--##################################################
+--#    hive to_date()
+--##################################################
 to_date(lcd)='2016-10-20'
-##################################################
-#    计算拥有同一手机号的记录数量（cust_num 不为空）
-##################################################
+--##################################################
+--#    计算拥有同一手机号的记录数量（cust_num 不为空）
+--##################################################
 count(cust_num) over (partition by mobile_num) as rn
-##################################################
-#    解决hive交互模式退格键乱码
-##################################################
+--##################################################
+--#    解决hive交互模式退格键乱码
+--##################################################
 vim /etc/profile
     stty erase ^H
-##################################################
-#    Data export & import
-##################################################
+--##################################################
+--#    Data export & import
+--##################################################
 /app/apache-hive-2.1.0-bin/bin/hive -e "describe extended xt_cfbdm_safe.employees" >> /app/document/hiveoutput.sh
 /app/apache-hive-2.1.0-bin/bin/hive -f hiveinput.sh >> /app/document/hiveoutput.sh
 insert overwrite local directory '/home/wyp/wyp' select * from wyp;
 insert overwrite directory '/home/wyp/hdfs' select * from wyp;
 load data local inpath '/app/document/hiveoutput.sh' OVERWRITE INTO TABLE employees07 PARTITION (country, state);
 load data inpath '/app/document/hiveoutput.sh' into table employees;
-##################################################
-#    Dictionary
-##################################################
+--##################################################
+--#    查看数据仓库信息
+--##################################################
 SHOW TABLES IN xt_cfbdm_safe;
 SHOW TABLES 'empl.*';
-SHOW PARTITIONS employees03;
-SHOW CREATE TABLE l_cust_basic_info;
-describe extended xt_cfbdm_safe.employees
-describe formatted xt_cfbdm_safe.employees
-DESCRIBE FORMATTED xt_cfbdm_safe.employees03 PARTITION (country='CHINA', state='HK');
 describe database xt_cfbdm_safe;
 describe database extended test03;
-set hive.exec.compress.intermediate
-set hive.mapred.mode=strict;
-set hive.mapred.mode=nonstrict;
-set hive.exec.dynamic.partition.mode=nonstrict
-set mapred.map.output.compression.codec=org.apache.hadoop.io.compress.SnappyCodec;
-set mapred.output.compression.codec=org.apache.hadoop.io.compress.GzipCodec;
-set mapred.output.compression.type=BLOCK;
-set hive.exec.compress.intermediate=true;
-set hive.exec.compress.output=true;
-set hive.cli.print.current.db=true;
-##################################################
-#    表数据汇总成一串文本
-##################################################
+--##################################################
+--#    表数据汇总成一串文本
+--##################################################
 Step 01 ： 将字段值转化为字符串
     nvl(cast(column_value as string), '')
 Step 02 :  将每个记录连接成一个字符串
@@ -117,18 +109,18 @@ Step 03 :  将仅剩的一列字符串转变成一个列表结构
     collect_set(concat(column_sum_name))
 Step 04:  将列表连接成一个字符串
     conncat_ws('&', collect_set(concat(column_sum_name)))
-##################################################
-#    DATABASE
-##################################################
+--##################################################
+--#    DATABASE
+--##################################################
 CREATE DATABASE IF NOT EXISTS test03 
 COMMENT 'Holds all financial tables'
 LOCATION '/user/xcc/warehouse/test01.db'
 WITH DBPROPERTIES ('creator' = 'Mark Moneybags', 'date' = '2012-01-02');
 ALTER DATABASE test03 SET DBPROPERTIES ('edited-by' = 'Joe Dba');
 DROP DATABASE IF EXISTS xt_cfbdm_safe CASCADE;
-##################################################
-#    TABLE
-##################################################
+--##################################################
+--#    TABLE
+--##################################################
 hv> CREATE EXTERNAL TABLE IF NOT EXISTS weblog 
 	(
 		user_id INT, 
@@ -174,18 +166,18 @@ hv> truncate table employees04;
 hv> DROP TABLE IF EXISTS employees;
 	--the expressions occuring in group by clause must be in the select clause too 
 hv> group by expressions	
-##################################################
-#    Special question
-##################################################
+--##################################################
+--#    Special question
+--##################################################
 trim()	--去除字段值中的空格
 order by --如果 expression 已经出现在 select 子句中并且赋了别名，就取别名排序
-##################################################
-#    User
-##################################################
+--##################################################
+--#    User
+--##################################################
 SHOW GRANT USER hduser0301 ON DATABASE xt_cfbdm_safe;
-##################################################
-#    HIVE常用函数集合
-##################################################
+--##################################################
+--#    HIVE常用函数集合
+--##################################################
 hive> select 1 from lxw_dual where 1=1;
 hive> select 1 from lxw_dual where 1 <> 2;
 hive> select 1 from lxw_dual where 1 < 2;
