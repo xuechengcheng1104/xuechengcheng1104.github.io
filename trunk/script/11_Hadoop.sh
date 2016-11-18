@@ -1,31 +1,31 @@
-﻿##################################################
+﻿#-------------------------------------------------
 #    regular commands
-##################################################
+#-------------------------------------------------
 hadoop fs -ls -R /
 hadoop fs -rmr /user/hive/warehouse/xt_cfbdm_safe.db/employees07/
 hdfs dfsadmin -report
-##################################################
+#-------------------------------------------------
 #    copy file
-##################################################
+#-------------------------------------------------
 hadoop fs -copyToLocal /user/hive/warehouse/xt_cfbdm_safe.db/employees07/country=CHINA/state=HK/input.q /app/document/output.q
 hadoop fs -copyFromLocal /app/document/input.q /user/xcc/input/input.q
 hadoop fs -cp filepath1 filepath2
-##################################################
+#-------------------------------------------------
 #     deal with filewalld
-##################################################
+#-------------------------------------------------
 telnet 11.258.154 50070
 netstat -an | grep 50070
 firewall-cmd --add-port=50070/tcp
-##################################################
+#-------------------------------------------------
 #     post step on hadoop vmware from junjian
-##################################################
+#-------------------------------------------------
 change VMware network to "host-only" model
 then change eth0 to 192.168.10.2
 then change hosts to 192.168.10.2 cfbdm
 then restart network service and hadoop software
-##################################################
+#-------------------------------------------------
 #     cluster setup
-##################################################
+#-------------------------------------------------
 # Step 1
 安装虚拟机master，
 编辑虚拟机设置 / 1G 内存 / host-only模式

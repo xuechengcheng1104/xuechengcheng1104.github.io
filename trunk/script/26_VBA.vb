@@ -1,7 +1,7 @@
 ﻿
-'##################################################
+'#-------------------------------------------------
 '#    WriteUtf8
-'##################################################
+'#-------------------------------------------------
 Function WriteUtf8(ByVal filename As String, ByVal content As String)
     Dim tempFilename As String
     tempFilename = filename & ".temp"
@@ -23,9 +23,9 @@ Function WriteUtf8(ByVal filename As String, ByVal content As String)
     ' 删除临时文件
     Kill tempFilename
 End Function
-'##################################################
+'#-------------------------------------------------
 '#    Utf8WithoutBom
-'##################################################
+'#-------------------------------------------------
 ' 去除BOM头
 Function Utf8WithoutBom(ByVal getPath As String, ByVal putPath As String)
     Dim getFileNum As Integer
@@ -43,9 +43,9 @@ Function Utf8WithoutBom(ByVal getPath As String, ByVal putPath As String)
     Close #getFileNum
     Close #putFileNum
 End Function
-'##################################################
+'#-------------------------------------------------
 '#    coordinator
-'##################################################
+'#-------------------------------------------------
 Sub coordinator()
 '
   Application.ScreenUpdating = False
@@ -243,9 +243,9 @@ Sub coordinator()
     Sheets("home").Select
     MsgBox "测试验收-定时作业已经生成！"
 End Sub
-'##################################################
+'#-------------------------------------------------
 '#    sqoop_import
-'##################################################
+'#-------------------------------------------------
 Sub sqoop_import()
 '
   Application.ScreenUpdating = False
@@ -402,9 +402,9 @@ Sub sqoop_import()
     Sheets("home").Select
     MsgBox "测试验收-导数作业已经生成！"
 End Sub
-'##################################################
+'#-------------------------------------------------
 '#    Utf8WithoutBom
-'##################################################
+'#-------------------------------------------------
 Sub shell_hive()
 '
   Application.ScreenUpdating = False
@@ -589,9 +589,9 @@ Sub shell_hive()
     Sheets("home").Select
     MsgBox "测试验收-修数作业已经生成！"
 End Sub
-'##################################################
+'#-------------------------------------------------
 '#    Utf8WithoutBom
-'##################################################
+'#-------------------------------------------------
 Sub sqoop_export()
 '
   Application.ScreenUpdating = False
@@ -777,9 +777,9 @@ Sub sqoop_export()
     Sheets("home").Select
     MsgBox "测试验收-推数作业已经生成！"
 End Sub
-'##################################################
+'#-------------------------------------------------
 '#    Utf8WithoutBom
-'##################################################
+'#-------------------------------------------------
 Sub update_cfbdm_properties()
 '
   Application.ScreenUpdating = False

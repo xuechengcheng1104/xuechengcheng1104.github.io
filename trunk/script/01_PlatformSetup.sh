@@ -1,17 +1,17 @@
-##################################################
+#-------------------------------------------------
 #    mount filesystem type 'ntfs'
-##################################################
+#-------------------------------------------------
 rpm -ivh ntfs-3g-2015.3.14-2.el7.x86_64.rpm 
 Sat Sep 24 09:40:38 CST 2016
-##################################################
+#-------------------------------------------------
 #   mount the image file of rhela
-##################################################
+#-------------------------------------------------
 mount /dev/sdc5 /app/usb01
 mount /app/usb01/FileTree/11_EnvorimentSetup/11_MySQLInstall/rhel-server-7.0-x86_64-dvd.iso /app/package/rhel_iso/
 Sat Sep 24 10:00:14 CST 2016
-##################################################
+#-------------------------------------------------
 #   registe reposible to local iso file
-##################################################
+#-------------------------------------------------
 cd /etc/yum.repos.d/
 vi local.repo
 	[base]
@@ -22,9 +22,9 @@ vi local.repo
 yum makecache
 yum install vim
 Sat Sep 24 10:06:52 CST 2016
-##################################################
+#-------------------------------------------------
 #  install MySQL
-##################################################
+#-------------------------------------------------
 yum install libaio
 yum install net-tools
 yum remove mariadb-libs
@@ -40,9 +40,9 @@ mysql_install_db  --datadir=/app/mysqldatadir --user=mysql
 mysqld_safe --datadir=/app/mysqldatadir/ --user=mysql
 mysqladmin -u root password '123456'
 Sat Sep 24 18:23:22 CST 2016
-##################################################
+#-------------------------------------------------
 #  install Hadoop
-##################################################
+#-------------------------------------------------
 yum install java-1.7.0-openjdk
 yum info java-1.7.0-openjdk
 rpm -ql java-1.7.0-openjdk
@@ -86,9 +86,9 @@ netstat -an | grep 50070
 yum install redhat-indexhtml
 rpm -ivh lynx-2.8.8-0.3.dev15.el7.x86_64.rpm
 Sat Sep 24 20:54:25 CST 2016
-##################################################
+#-------------------------------------------------
 #  install hive
-##################################################
+#-------------------------------------------------
 yum install yum-utils
 yumdownloader mysql-connector-java
 rpm -ql mysql-connector-java

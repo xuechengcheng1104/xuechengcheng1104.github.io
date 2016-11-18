@@ -1,7 +1,7 @@
 ﻿
-##################################################
+#-------------------------------------------------
 #sqoop 从oracle库导数据到hive
-##################################################
+#-------------------------------------------------
 sqoop import \
 -Dmapred.job.queue.name="queue02" \
 --connect jdbc:oracle:thin:@${tdw_db_url} \
@@ -23,9 +23,9 @@ and to_date(to_char(LCD, 'yyyy-mm-dd'), 'yyyy-mm-dd') >= to_date('${end_date}', 
 --delete-target-dir \
 --hive-overwrite \
 --hive-table xt_trapp_safe.WORKDAY_TABLE
-##################################################
+#-------------------------------------------------
 #sqoop shell脚本中做hive处理
-##################################################
+#-------------------------------------------------
 hvie -e "
 set mapred.job.queue.name=${queue};
 insert overwrite directory '/apps-data/hduser0301/xt_trapp_safe/workdmay_table'
@@ -41,9 +41,9 @@ select
 from xt_trapp_safe.workday_table
 where to_date(lcd)='${txdate}'
 "
-##################################################
+#-------------------------------------------------
 #sqoop 链接mysql库执行语句
-##################################################
+#-------------------------------------------------
 sqoop eval \
 -Dmapred.job.queue.name=${queue} \
 --connect ${connect}
@@ -52,9 +52,9 @@ sqoop eval \
 -e "
 truncate table cfbbi.workday_table_tmp;
 "
-##################################################
+#-------------------------------------------------
 #sqoop 从hive库导数据到mysql库
-##################################################
+#-------------------------------------------------
 sqoop export \
 -Dmapred.job.queue.name=${queue} \
 --connect ${connect} \
@@ -69,11 +69,11 @@ sqoop export \
 --input-hive-drop-import-delime \
 --input-null-string "\\\\N" \
 --input-null-non-string "\\\\N" \
-##################################################
+#-------------------------------------------------
 #import error: output directory already exists
-##################################################
+#-------------------------------------------------
 --delete-target-dir #add this option
-##################################################
+#-------------------------------------------------
 #import : 数据格式问题
-##################################################
+#-------------------------------------------------
 hive中以string类型存储，遇日期比较问题用to_date()转换
