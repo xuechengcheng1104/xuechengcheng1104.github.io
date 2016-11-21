@@ -11,9 +11,9 @@ github123456
 #-------------------------------------------------
 #    系统配置参数
 #-------------------------------------------------
->> PATH
+#PATH
 %CATALINA_HOME%\bin;%JAVA_HOME%\bin;%JAVA_HOME%\jre\bin;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PrivateAssemblies\
->> PATH (user)
+#PATH (user)
 D:\Users\Matt\AppData\Local\Programs\Python\Python36\Scripts\;D:\Users\Matt\AppData\Local\Programs\Python\Python36\;%SCALA_HOME%\bin
 #-------------------------------------------------
 #    翻墙账号
@@ -39,22 +39,24 @@ B%a6Kj9?	邮箱账号
 #-------------------------------------------------
 #      资料链接
 #-------------------------------------------------
->> windows batch programming
+#windows batch programming
 http://blog.csdn.net/steven6977/article/details/10823165
->> python博客案例
+#python博客案例
 http://www.soso.io/article/40871.html
->> python常用库
+#python常用库
 http://www.cnblogs.com/xueranzp/p/5787270.html
->> 正则表达式
+#正则表达式
 http://www.runoob.com/regexp/regexp-syntax.html
->> Linux Document Project
+#Linux Document Project
 http://www.tldp.org/guides.html
->> gnu软件手册
+#gnu软件手册
 http://www.gnu.org/manual/manual.html
->> git手册
+#git手册
 http://www.open-open.com/lib/view/open1328069609436.html
->> 教程
+#教程
 http://www.w3school.com.cn/
+#R编程资料
+http://www.cnblogs.com/wentingtu/archive/2012/03/03/2377977.html
 #-------------------------------------------------
 #      衣服尺寸
 #-------------------------------------------------
