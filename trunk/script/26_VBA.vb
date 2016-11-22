@@ -7,7 +7,7 @@ Function WriteUtf8(ByVal filename As String, ByVal content As String)
     tempFilename = filename & ".temp"
     ' 将字符写入utf8编码的临时文件
     Dim WriteStream As Object
-    Set WriteStream = CreateObject("ADODB.Stream")
+    Set WriteStream = CreateObject("ADODB.Stream") '判断文件编码，及进行编码转换
     With WriteStream
         .Type = 2               'adTypeText
         .CharSet = "UTF-8"
@@ -60,7 +60,7 @@ Sub coordinator()
   root_path = Cells(4, 7) & "\"
   version_path = root_path & Cells(3, 7) & "\"
   python_path = root_path & "Public\python"
-  Set MyFile = CreateObject("Scripting.FileSystemObject")
+  Set MyFile = CreateObject("Scripting.FileSystemObject") '文件处理
   Sheets("coordinator").Select
   arr = Range("A1").CurrentRegion
   For i = 2 To UBound(arr)
@@ -72,7 +72,7 @@ Sub coordinator()
     coord_name = Cells(i, 3)
     job_start = Cells(i, 8)
     job_end = Cells(i, 9)
-    If Dir(version_path & level_path, vbDirectory) = "" Then
+    If Dir(version_path & level_path, vbDirectory) = "" Then 'dir()检查目录/文件是否存在
         MkDir version_path & level_path
     End If
     '1. ###### 判断coordinator.xml、cfbdm.properties、runJob.sh是否存在 ######
@@ -82,7 +82,7 @@ Sub coordinator()
     runjob_name = path_name & "runJob.sh"
     If Dir(path_name, vbDirectory) <> "" Then
       If MyFile.FileExists(coordinator_name) = True Then
-          Kill (coordinator_name)
+          Kill (coordinator_name) '删除文件
       End If
     Else
       MkDir path_name
@@ -101,7 +101,7 @@ Sub coordinator()
     Else
       MkDir path_name
     End If
-    MyFile.CopyFolder python_path, path_name
+    MyFile.CopyFolder python_path, path_name '复制文件夹
     '1. ##############################################
     '2. ###### 生成coordinator.xml文件 ######
     Open coordinator_name For Append As #1

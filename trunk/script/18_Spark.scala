@@ -85,10 +85,10 @@ object scala {
   }
 }
 //#-------------------------------------------------
-//#Streaming Socket
+//#Dstream Socket
 //#-------------------------------------------------
 val lines = ssc.socketTextStream("localhost", 9999)
 val words = lines.flatMap(_.split(" "))
 val pairs = words.map(word => (word, 1))
 val wordCounts = pairs.reduceByKey(_ + _)  // the same as SQL group by then count()
-wordCounts.print()
+wordCounts.foreachRDD(rdd => rdd.foreach(println))
