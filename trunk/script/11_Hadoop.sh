@@ -1,9 +1,13 @@
 ﻿#-------------------------------------------------
-#    regular commands
+#    hadoop检查
+#-------------------------------------------------
+hadoop fsck /user/hive/warehouse/xt_cfbdm_safe.db
+hdfs dfsadmin -report
+#-------------------------------------------------
+#    文件删除
 #-------------------------------------------------
 hadoop fs -ls -R /
 hadoop fs -rmr /user/hive/warehouse/xt_cfbdm_safe.db/employees07/
-hdfs dfsadmin -report
 #-------------------------------------------------
 #    copy file
 #-------------------------------------------------

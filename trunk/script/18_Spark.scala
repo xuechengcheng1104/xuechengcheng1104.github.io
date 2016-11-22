@@ -1,5 +1,22 @@
 ﻿
 //#-------------------------------------------------
+//#Key-Value Pairs
+//#-------------------------------------------------
+val distFile = sc.textFile("data.txt")
+val pairs = distFile.map(s => (s.length, 1))
+val counts = pairs.reduceByKey((a, b) => a + b) // the same as SQL group by then count()
+counts.foreach(println)
+//#-------------------------------------------------
+//#RDD输出
+//#-------------------------------------------------
+val distFile = sc.textFile("data.txt")
+distFile.foreach(println)
+distFile.collect().foreach(println) // fetches the entire RDD to a single machine
+distFile.take(30).foreach(println)  // then same as SQL limit 30
+counts.saveAsTextFile("output.txt")
+counts.coalesce(1,true).saveAsTextFile("output.txt")
+counts.repartition(1).saveAsTextFile("output.txt") // the same as the statement above
+//#-------------------------------------------------
 //#IDEA spark enviroment setup
 //#-------------------------------------------------
 //enviroment 1
@@ -13,7 +30,7 @@ spark 2.0
 hadoop 2.6
 解压hadoop配置HADOOP_HOME重启电脑，或者代码中添加 
 	System.setProperty("hadoop.home.dir", "E:\\00_FileTree\\16_TempFile\\hadoop-2.6.4");
-克隆https://github.com/srccodes/hadoop-common-2.2.0-bin 取文件winutils.exe到hadoop的bin目录
+colone "https://github.com/srccodes/hadoop-common-2.2.0-bin" 取文件winutils.exe到hadoop的bin目录
 //#-------------------------------------------------
 //#init SparkContext
 //#-------------------------------------------------
@@ -68,10 +85,10 @@ object scala {
   }
 }
 //#-------------------------------------------------
-//#Socket Streaming
+//#Streaming Socket
 //#-------------------------------------------------
 val lines = ssc.socketTextStream("localhost", 9999)
 val words = lines.flatMap(_.split(" "))
 val pairs = words.map(word => (word, 1))
-val wordCounts = pairs.reduceByKey(_ + _)
+val wordCounts = pairs.reduceByKey(_ + _)  // the same as SQL group by then count()
 wordCounts.print()
