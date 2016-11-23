@@ -32,7 +32,7 @@ hadoop 2.6
 	System.setProperty("hadoop.home.dir", "E:\\00_FileTree\\16_TempFile\\hadoop-2.6.4");
 colone "https://github.com/srccodes/hadoop-common-2.2.0-bin" 取文件winutils.exe到hadoop的bin目录
 //#-------------------------------------------------
-//#init SparkContext
+//#SparkContext
 //#-------------------------------------------------
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
@@ -45,13 +45,13 @@ object scala {
   }
 }
 //#-------------------------------------------------
-//#Array
+//#RDD
 //#-------------------------------------------------
 val data = Array(1, 2, 3, 4, 5)
 val distData = sc.parallelize(data)
 println(distData.reduce((a, b) => a + b))
 //#-------------------------------------------------
-//#File read
+//#RDD
 //#-------------------------------------------------
 val distFile = sc.textFile("data.txt")
 println(distFile.map(s => s.length).reduce((a, b) => a + b))
@@ -69,7 +69,7 @@ val accum = sc.accumulator(0)
 sc.parallelize(Array(1, 2, 3, 4)).foreach(x => accum += x)
 println(accum.value)
 //#-------------------------------------------------
-//#init SparkSteaming
+//#StreamingContext
 //#-------------------------------------------------
 package main.scala.Test
 import org.apache.spark.SparkConf
@@ -85,7 +85,7 @@ object scala {
   }
 }
 //#-------------------------------------------------
-//#Dstream Socket
+//#DStream
 //#-------------------------------------------------
 val lines = ssc.socketTextStream("localhost", 9999)
 val words = lines.flatMap(_.split(" "))
