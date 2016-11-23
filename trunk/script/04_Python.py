@@ -86,3 +86,57 @@ with open('output.q', 'r+') as f:
 		v2_string = "\n"+v2_string.replace("]","")
 		f.write(v2_string)
 f.close()
+#-------------------------------------------------
+#    替换参数文件中的参数值
+#-------------------------------------------------
+#!/user/bin/python
+import sys
+import re
+import datetime
+
+params=sys.argv
+fobj=open(params[1], 'r')
+
+def defineFileType(filename):
+	array=filename.split('.')
+	return array[len(array)-1]
+def getJobStartDate():
+	return params[2]
+def jobStartChange(job_start):
+	time=job_start[job_start.index('T'):]
+	return 'job_start='+getJobStartDate()+time
+def getJobEndDate():
+	return params[3]
+def jobEndChange(job_end):
+	time=job_end[job_end.index('T'):]
+	return 'job_end='+getJobEndDate()+time
+def replacePropValue(input_str):
+	if input_str=='':
+		return input_str
+	str_key=input_str[0:input_str.index('=')]
+	if str_key=='job_start':
+		return jobStartChange(input_str)
+	if str_key=='job_end':
+		return jobEndChange(input_str)
+	return input_str
+
+output=""
+try:
+	if defineFileType(params[1])=='properties':
+		for line in fobj:
+			if line.startswith('#'): #return true if this line start with '#'
+				output+=line.strip() #删除首尾指定字符（默认为空格）
+				output+='\n'
+				continue
+			tmp=line.strip()
+			flag=replacePropValue(line.strip()) #this the the key
+			if flag != line.strip():
+				tmp=flag
+			output+=tmp
+			output+='\n'
+finally:
+	fobj.close()
+
+f=open(params[1],'w') #写文件，'w+'追加文件
+f.write(output)
+f.close()
