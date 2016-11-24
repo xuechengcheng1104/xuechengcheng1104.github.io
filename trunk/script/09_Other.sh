@@ -57,6 +57,8 @@ http://www.open-open.com/lib/view/open1328069609436.html
 http://www.w3school.com.cn/
 #R编程资料
 http://www.cnblogs.com/wentingtu/archive/2012/03/03/2377977.html
+#scala教程
+www.runoob.com/scala/
 #-------------------------------------------------
 #      衣服尺寸
 #-------------------------------------------------
