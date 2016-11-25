@@ -153,6 +153,7 @@ object SparkRDD {
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
     //...
+    spark.stop()
   }
 }
 //#-------------------------------------------------
@@ -209,3 +210,37 @@ val peopleDF = spark.createDataFrame(rowRDD, schema)
 peopleDF.createOrReplaceTempView("people")
 val results = spark.sql("SELECT * FROM people")
 results.show()
+//#-------------------------------------------------
+//#default source format-parquet
+//#-------------------------------------------------
+val path = "input/users.parquet"
+val usersDF = spark.read.load(path)
+usersDF.printSchema()
+usersDF.select("name", "favorite_color").show()
+usersDF.select("name", "favorite_color").write.save("output/namesAndFavColors.parquet")
+//#-------------------------------------------------
+//#manully specify format
+//#-------------------------------------------------
+val path = "input/people.json"
+val peopleDF = spark.read.format("json").load(path)
+peopleDF.printSchema()
+peopleDF.show()
+peopleDF.select("name", "age").write.format("parquet").save("output/namesAndAges.parquet")
+//#-------------------------------------------------
+//#run sql on file
+//#-------------------------------------------------
+val sqlDF = spark.sql("SELECT * FROM json.`input/ChineseCities.json`")
+sqlDF.printSchema()
+sqlDF.select("city.area").show()
+sqlDF.select("city.area").write.format("json").save("output/namesAndAges.json")
+//#-------------------------------------------------
+//#partition merge
+//#-------------------------------------------------
+import spark.implicits._
+val squaresDF = spark.sparkContext.makeRDD(1 to 5).map(i => (i, i * i)).toDF("value", "square")
+squaresDF.write.parquet("output/data/test_table/key=1")
+val cubesDF = spark.sparkContext.makeRDD(6 to 10).map(i => (i, i * i * i)).toDF("value", "cube")
+cubesDF.write.parquet("output/data/test_table/key=2")
+val mergedDF = spark.read.option("mergeSchema", "true").parquet("output/data/test_table")
+mergedDF.printSchema()
+mergedDF.show()

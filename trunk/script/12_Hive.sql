@@ -13,7 +13,7 @@ describe formatted xt_cfbdm_safe.l_cust_basic_info partition (elt_dt=date'2016-1
 --#-------------------------------------------------
 --#    解析json字段
 --#-------------------------------------------------
-select get_json_object(tablename.columnname, '$.jsoncolumnname') from tablename;
+select get_json_object(t.json_line, '$.jsoncolumnname.publishInfo.appProductUnderTime') from tablename t;
 --#-------------------------------------------------
 --#    删除字段
 --#-------------------------------------------------
