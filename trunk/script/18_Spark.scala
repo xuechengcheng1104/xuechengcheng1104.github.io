@@ -131,3 +131,81 @@ val words = lines.flatMap(_.split(" "))
 val pairs = words.map(word => (word, 1))
 val stateDstream = pairs.updateStateByKey[Int](updateFunc)
 stateDstream.foreachRDD(rdd => rdd.foreach(println))
+//#-------------------------------------------------
+//#SparkContext -> SparkSession
+//#-------------------------------------------------
+val rdd1 = sc.makeRDD(Array(("A", "1"),("B", "2"),("C", "3")), 2)
+val spark = SparkSession.builder.config(rdd1.sparkContext.getConf).getOrCreate()
+import spark.implicits._ //隐式转换
+rdd1.toDF("word", "code").createOrReplaceTempView("words") // Register the DataFrame as a SQL temporary view
+val wordCountsDataFrame = spark.sql("select * from words")
+//#-------------------------------------------------
+//#init SparkSession
+//#-------------------------------------------------
+package main.Spark.SQL
+import org.apache.spark.sql.SparkSession
+object SparkRDD {
+  def main(args: Array[String]) {
+    val spark = SparkSession
+      .builder()
+      .appName("Simple Application")
+      .master("local[2]")
+      .config("spark.some.config.option", "some-value")
+      .getOrCreate()
+    //...
+  }
+}
+//#-------------------------------------------------
+//#读取json文件，输出DF
+//#-------------------------------------------------
+val path = "input/data02.txt"
+spark.read.json(path).createOrReplaceTempView("Employee")
+val EmployeeDF=spark.sql("select * from Employee")
+EmployeeDF.printSchema()
+EmployeeDF.show()
+//#-------------------------------------------------
+//#DF操作
+//#-------------------------------------------------
+wordCountsDataFrame.printSchema()
+wordCountsDataFrame.show()
+wordCountsDataFrame.select("word").show()
+wordCountsDataFrame.select($"word", $"code"+10).show()
+wordCountsDataFrame.groupBy($"word").count()show()
+wordCountsDataFrame.filter($"code" > 4).show()
+//#-------------------------------------------------
+//#toDS
+//#-------------------------------------------------
+case class Person(name: String, age: Long) //放到main函数外面
+import spark.implicits._
+val caseClassDS = Seq(Person("Andy", 32)).toDS()
+caseClassDS.show()
+val primitiveDS = Seq(1, 2, 3).toDS()
+primitiveDS.map(_ + 1).show()
+//#-------------------------------------------------
+//#toDF
+//#-------------------------------------------------
+import spark.implicits._
+val peopleDF = spark.sparkContext
+  .textFile("input/data01.txt")
+  .map(_.split(" "))
+  .map(attributes => Person(attributes(0), attributes(1).trim.toInt))
+  .toDF()
+peopleDF.createOrReplaceTempView("people")
+val teenagersDF = spark.sql("SELECT * FROM people")
+teenagersDF.show()
+teenagersDF.map(teenager => "Name: " + teenager(0)).show()
+teenagersDF.map(teenager => "Name: " + teenager.getAs[String]("name")).show()
+//#-------------------------------------------------
+//#Specifying the Schema
+//#-------------------------------------------------
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types._
+val peopleRDD = spark.sparkContext.textFile("input/data01.txt")
+val rowRDD = peopleRDD.map(_.split(" ")).map(attributes => Row(attributes(0), attributes(1).trim))
+val schemaString = "name age"
+val fields = schemaString.split(" ").map(fieldName => StructField(fieldName, StringType, nullable = true))
+val schema = StructType(fields)
+val peopleDF = spark.createDataFrame(rowRDD, schema)
+peopleDF.createOrReplaceTempView("people")
+val results = spark.sql("SELECT * FROM people")
+results.show()

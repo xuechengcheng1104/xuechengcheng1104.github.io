@@ -298,8 +298,8 @@ hive> select concat_ws(',','abc','def','gh') from lxw_dual;
 hive> select substr('abcde',3) from lxw_dual;
 hive> select substring('abcde',3) from lxw_dual;
 hive> select substr('abcde',-1) from lxw_dual; （和Oracle相同）
-hive> select substr('abcde',3,2) from lxw_dual;
-hive> select substring('abcde',3,2) from lxw_dual;
+hive> select substr('abcde',3,2) from lxw_dual; --第三个字符开始截取2个字符。"cd"
+hive> select substring('abcde',3,2) from lxw_dual; --较小参数为开始位置，较大参数为结束位置
 hive> select substring('abcde',-2,2) from lxw_dual;
 hive> select upper('abSEd') from lxw_dual;
 hive> select ucase('abSEd') from lxw_dual;
