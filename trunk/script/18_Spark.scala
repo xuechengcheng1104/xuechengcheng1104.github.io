@@ -1,30 +1,5 @@
 ﻿
 //#-------------------------------------------------
-//#leftOuterJoin
-//#-------------------------------------------------
-val rdd1 = sc.makeRDD(Array(("A", "1"),("B", "2"),("C", "3")), 2)
-val rdd2 = sc.makeRDD(Array(("A", "a"),("C", "c"),("D", "d")), 2)
-val rdd3 = sc.makeRDD(Array(("A", "4"),("C", "5"),("D", "6")), 2)
-rdd1.leftOuterJoin(rdd2).leftOuterJoin(rdd3).collect.foreach(println)
-rdd1.leftOuterJoin(rdd2).leftOuterJoin(rdd3).repartition(1).saveAsTextFile("output/output.txt")
-//#-------------------------------------------------
-//#Key-Value Pairs
-//#-------------------------------------------------
-val distFile = sc.textFile("data.txt")
-val pairs = distFile.map(s => (s.length, 1))
-val counts = pairs.reduceByKey((a, b) => a + b) // the same as SQL group by then count()
-counts.foreach(println)
-//#-------------------------------------------------
-//#RDD输出
-//#-------------------------------------------------
-val distFile = sc.textFile("data.txt")
-distFile.foreach(println)
-distFile.collect().foreach(println) // fetches the entire RDD to a single machine
-distFile.take(30).foreach(println)  // then same as SQL limit 30
-counts.saveAsTextFile("output.txt")
-counts.coalesce(1,true).saveAsTextFile("output.txt")
-counts.repartition(1).saveAsTextFile("output.txt") // the same as the statement above
-//#-------------------------------------------------
 //#IDEA spark enviroment setup
 //#-------------------------------------------------
 //enviroment 1
@@ -58,6 +33,31 @@ object scala {
 val data = Array(1, 2, 3, 4, 5)
 val distData = sc.parallelize(data)
 println(distData.reduce((a, b) => a + b))
+//#-------------------------------------------------
+//#RDD输出
+//#-------------------------------------------------
+val distFile = sc.textFile("data.txt")
+distFile.foreach(println)
+distFile.collect().foreach(println) // fetches the entire RDD to a single machine
+distFile.take(30).foreach(println)  // then same as SQL limit 30
+counts.saveAsTextFile("output.txt")
+counts.coalesce(1,true).saveAsTextFile("output.txt")
+counts.repartition(1).saveAsTextFile("output.txt") // the same as the statement above
+//#-------------------------------------------------
+//#Key-Value Pairs
+//#-------------------------------------------------
+val distFile = sc.textFile("data.txt")
+val pairs = distFile.map(s => (s.length, 1))
+val counts = pairs.reduceByKey((a, b) => a + b) // the same as SQL group by then count()
+counts.foreach(println)
+//#-------------------------------------------------
+//#leftOuterJoin
+//#-------------------------------------------------
+val rdd1 = sc.makeRDD(Array(("A", "1"),("B", "2"),("C", "3")), 2)
+val rdd2 = sc.makeRDD(Array(("A", "a"),("C", "c"),("D", "d")), 2)
+val rdd3 = sc.makeRDD(Array(("A", "4"),("C", "5"),("D", "6")), 2)
+rdd1.leftOuterJoin(rdd2).leftOuterJoin(rdd3).collect.foreach(println)
+rdd1.leftOuterJoin(rdd2).leftOuterJoin(rdd3).repartition(1).saveAsTextFile("output/output.txt")
 //#-------------------------------------------------
 //#文件源
 //#-------------------------------------------------
@@ -105,23 +105,21 @@ wordCounts.foreachRDD(rdd => rdd.foreach(println))
 //#-------------------------------------------------
 //#RDD队列数据源
 //#-------------------------------------------------
-val rddQueue = new mutable.SynchronizedQueue[RDD[Int]]()
+val rddQueue = new mutable.Queue[RDD[Int]]()
 val inputStream = ssc.queueStream(rddQueue)
-val mappedStream = inputStream.map(x => (x % 10,1))
-val reduceStream = mappedStream.reduceByKey(_ + _)
-reduceStream.print
+inputStream.map(x => (x % 10,1)).reduceByKey(_ + _).print()
 ssc.start()
 for(i <- 1 to 30){
   rddQueue += ssc.sparkContext.makeRDD(1 to 100, 2)   //创建RDD，并分配两个核数
   Thread.sleep(1000)
 }
-ssc.stop()
+ssc.awaitTermination()
 //#-------------------------------------------------
 //#累计更新键值
 //#-------------------------------------------------
 //定义状态更新函数
 val updateFunc = (values: Seq[Int], state: Option[Int]) => {
-	val currentCount = values.foldLeft(0)(_ + _)
+	val currentCount = values.foldLeft(0)(_ + _) //累积器
 	val previousCount = state.getOrElse(0)
 	Some(currentCount + previousCount)
 }

@@ -8,7 +8,7 @@ sqoop import \
 --username ${tdw_db_username} \
 --password ${tdw_db_password} \
 --table "tdwdata.BDL_WORKDAY_TABLE" \
---columns "DATEVALUE, DATEWEEK, DATEFLAG, FCU, FCD, LCU, LCD, DEALFLAG" \
+--columns "DATEVALUE, DATEWEEK, DATEFLAG, FCU, FCD, LCU, LCD, DEALFLAG" \ #字段名要大写
 --where "
 to_date(to_char(LCD, 'yyyy-mm-dd'), 'yyyy-mm-dd') >= to_date('${nominal_date}', 'yyyy-mm-dd')
 and to_date(to_char(LCD, 'yyyy-mm-dd'), 'yyyy-mm-dd') >= to_date('${end_date}', 'yyyy-mm-dd')

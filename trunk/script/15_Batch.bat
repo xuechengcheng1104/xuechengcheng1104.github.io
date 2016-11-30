@@ -20,3 +20,10 @@ rename "[阳光电影www.ygdy8.com]冰与火之歌：权力的游戏.第五季�
 ::#     进入远程共享目录
 ::#-------------------------------------------------
 click "Start" button / input "\\10.240.170.50"
+::#-------------------------------------------------
+::#     和同一网段电脑共享文件夹
+::#-------------------------------------------------
+关闭防火墙
+go into Control Panel\Network and Internet\Network and Sharing Center\Advanced sharing settings
+turn off option "Password protected sharing"
+then give account "everyone" full control right.

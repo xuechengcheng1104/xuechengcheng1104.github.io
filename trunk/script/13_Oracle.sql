@@ -15,9 +15,10 @@ insert into cfbic.circle_product_info
 values
 ('1', 'milk', to_date('2016-10-26 12:00:00', 'yyyy-mm-dd hh24:mi:ss'))	--mysql insert characters string directly
 #-------------------------------------------------
-#    oracle 表名区分大小写
+#    oracle 表名,字段名，区分大小写
 #-------------------------------------------------
 select * from all_tables where lower(table_name) like '%circle_info%';
+SELECT ID FROM CFBIC.CIRCLE_INFO; --sqoop导数要使用大写
 #-------------------------------------------------
 #    pl/sql developer 首选项
 #-------------------------------------------------
