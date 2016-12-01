@@ -108,6 +108,7 @@ wordCounts.foreachRDD(rdd => rdd.foreach(println))
 val rddQueue = new mutable.Queue[RDD[Int]]()
 val inputStream = ssc.queueStream(rddQueue)
 inputStream.map(x => (x % 10,1)).reduceByKey(_ + _).print()
+inputStream.saveAsTextFiles("output/DStream")
 ssc.start()
 for(i <- 1 to 30){
   rddQueue += ssc.sparkContext.makeRDD(1 to 100, 2)   //创建RDD，并分配两个核数

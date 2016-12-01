@@ -1,5 +1,17 @@
 ﻿
 --#-------------------------------------------------
+--#    建表语句
+--#-------------------------------------------------
+use xt_trapp_safe;
+drop table if exists xt_trapp_safe.ORDER_DETAIL;
+create table xt_trapp_safe.ORDER_DETAIL(
+	APPLY_NO string comment '...'
+	,APPLY_DATE timestamp
+	,CARD_PAY decimal(22,2)
+)comment '订单明细'
+row format delimited fields terminated by "\001" line terminated by "\n" stored as textfile
+;
+--#-------------------------------------------------
 --#    模糊查询
 --#-------------------------------------------------
 show table like '*_tmp'

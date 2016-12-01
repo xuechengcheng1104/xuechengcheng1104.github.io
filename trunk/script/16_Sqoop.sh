@@ -16,7 +16,7 @@ and to_date(to_char(LCD, 'yyyy-mm-dd'), 'yyyy-mm-dd') >= to_date('${end_date}', 
 -m 1 \
 --fields-terminated-by "\001" \
 --lines-terminated-by "\n" \
---hive-drop-import-delime \
+--hive-drop-import-delime \ #去掉hive默认的分隔符
 --null-string "\\\\N" \
 --null-non-string "\\\\N" \
 --hive-import \

@@ -6,6 +6,9 @@
 	<shell xmlns="uri:oozie:shell-action:0.2">
 		<job-tracker>${jobtracker_address}</job-tracker>
 		<name-node>${namenode_address}</name-node>
+		<prepare>
+			<delete path="${monitor_table_status_path}/ORDER_DETAIL/${monitor_date}"/>
+		</prepare>
 		<configuration>
 			<property>
 				<name>mapred.job.queue.name</name>
