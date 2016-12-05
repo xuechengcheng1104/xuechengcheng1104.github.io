@@ -9,7 +9,7 @@ create table xt_trapp_safe.ORDER_DETAIL(
 	,APPLY_DATE timestamp
 	,CARD_PAY decimal(22,2)
 )comment '订单明细'
-row format delimited fields terminated by "\001" line terminated by "\n" stored as textfile
+row format delimited fields terminated by "\001" lines terminated by "\n" stored as textfile
 ;
 --#-------------------------------------------------
 --#    模糊查询
@@ -29,7 +29,7 @@ describe formatted xt_cfbdm_safe.l_cust_basic_info partition (elt_dt=date'2016-1
 --#-------------------------------------------------
 --#    解析json字段
 --#-------------------------------------------------
-select get_json_object(t.json_line, '$.jsoncolumnname.publishInfo.appProductUnderTime') from tablename t;
+select get_json_object(t.json_line, '$.jsoncolumnname.publishInfo.appProductUnderTime') from tablename t; --json数据不可以出现ISOData()这样的函数
 --#-------------------------------------------------
 --#    删除字段
 --#-------------------------------------------------
@@ -324,7 +324,7 @@ hive> select lcase('abSEd') from lxw_dual;
 hive> select trim(' abc ') from lxw_dual;
 hive> select ltrim(' abc ') from lxw_dual;
 hive> select rtrim(' abc ') from lxw_dual;
-hive> select regexp_replace('foobar', 'oo|ar', '') from lxw_dual;
+hive> select regexp_replace('foobar', 'oo|ar', '') from lxw_dual; --替换函数
 hive> select regexp_extract('foothebar', 'foo(.*?)(bar)', 1) fromlxw_dual;
 hive> select regexp_extract('foothebar', 'foo(.*?)(bar)', 2) fromlxw_dual;
 hive> select regexp_extract('foothebar', 'foo(.*?)(bar)', 0) fromlxw_dual;

@@ -243,3 +243,11 @@ cubesDF.write.parquet("output/data/test_table/key=2")
 val mergedDF = spark.read.option("mergeSchema", "true").parquet("output/data/test_table")
 mergedDF.printSchema()
 mergedDF.show()
+//#-------------------------------------------------
+//#RDD存放json数据
+//#-------------------------------------------------
+val otherPeopleRDD = spark.sparkContext.makeRDD("""{"name":"Yin","address":{"city":"Columbus","state":"Ohio"}}""" :: Nil)
+otherPeopleRDD.foreach(println)
+val otherPeople = spark.read.json(otherPeopleRDD)
+otherPeople.printSchema()
+otherPeople.select("name","address.city","address.state").show()
