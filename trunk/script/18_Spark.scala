@@ -251,3 +251,39 @@ otherPeopleRDD.foreach(println)
 val otherPeople = spark.read.json(otherPeopleRDD)
 otherPeople.printSchema()
 otherPeople.select("name","address.city","address.state").show()
+//#-------------------------------------------------
+//#Spark-Hive SQL
+//#-------------------------------------------------
+package main.Spark
+import org.apache.spark.sql.SparkSession
+object SparkSQL {
+  case class Record(key: Int, value: String)
+  def main(args: Array[String]) {
+    val warehouseLocation = "file:\\\\\\E:\\00_FileTree\\27_Spark\\spark-warehouse"  //file:\\\E:\00_FileTree\27_Spark\spark-warehouse
+    val spark = SparkSession
+      .builder()
+      .appName("Simple Application")
+      .master("local[2]")
+      .config("spark.sql.warehouse.dir", warehouseLocation)
+      .enableHiveSupport()
+      .getOrCreate()
+    //...
+    import spark.sql
+    sql("CREATE TABLE IF NOT EXISTS src (key INT, value STRING)")
+    sql("LOAD DATA LOCAL INPATH 'input/kv1.txt' INTO TABLE src")
+    sql("SELECT * FROM src").show()
+  }
+}
+//#-------------------------------------------------
+//#Spark 链接mssqlserver
+//#-------------------------------------------------
+Step 1: 下载sqljdbc_6.0.7728.100_enu.exe，解压
+Step 2: 导入文件sqljdbc4.jar到IDEA工程的library
+val jdbcDF = spark.read
+  .format("jdbc")
+  .option("url", "jdbc:sqlserver://localhost:49434;databasename=Landa_CDRJ_153_2_04")
+  .option("dbtable", "dbo.CSEMPL_1")
+  .option("user", "sa")
+  .option("password", "123456")
+  .load()
+jdbcDF.printSchema()

@@ -187,7 +187,7 @@ function depend()
 		done
 	done
 }
-echo '' > ./inputtotal.q
+cat ./input.q > ./inputtotal.q
 echo '' > ./output.q
 v7_inputnull=./input.q
 v6_iterator=1
@@ -202,7 +202,6 @@ echo 'analyze successed!'
 #shell scripts - 字符串截取
 #-------------------------------------------------
 #!/bin/bash
-str='http://www.baidu.com/cut-string.html'
 str='http://www.baidu.com/cut-string.html'
 echo ${str#*//}        #start from left, delete the shortest matched partern like '*//'
 echo ${str##*/}        #start from left, delete the longest matched partern like '*/'

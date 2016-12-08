@@ -3,12 +3,20 @@
 //#operations on file
 //#-------------------------------------------------
 import scala.io.Source
-if (args.length > 0) {
-  for (line <- Source.fromFile(args(0)).getLines)
-    println(line.length +" "+ line)
+object Other {
+  def main(args: Array[String]): Unit = {
+    val v_string: StringBuilder = new StringBuilder("")
+    val localfile = Source.fromFile("input/people.json", "UTF-8")
+    for (line <- localfile.getLines()) {
+      if (line.indexOf("--") == -1) {
+        v_string.append(line)
+        v_string.append(" ")
+      }
+    }
+    println(v_string.toString)
+    localfile.close()
+  }
 }
-else
-  Console.err.println("Please enter filename")
 //#-------------------------------------------------
 //#对List遍历
 //#-------------------------------------------------
@@ -143,3 +151,73 @@ val it = Iterator("Baidu", "Google", "Runoob", "Taobao")
 while (it.hasNext){
   println(it.next())
 }
+//#-------------------------------------------------
+//#格式化输出
+//#-------------------------------------------------
+var floatVar = 12.456
+var intVar = 2000
+var stringVar = "菜鸟教程!"
+var fs = printf("浮点型变量为 " + "%f, 整型变量为 %d, 字符串为 " + " %s", floatVar, intVar, stringVar)
+println(fs)
+//#-------------------------------------------------
+//#配置文件数据获取方式
+//#-------------------------------------------------
+import java.io.{File, FileInputStream}
+import java.util.Properties
+object Other {
+  def main(args: Array[String]): Unit = {
+    val v_config = new Properties()
+    val v_url_prefix = System.getProperty("user.dir")
+    val v_configure_url = v_url_prefix + File.separator + "input" + File.separator + "configure.properties"
+    v_config.load(new FileInputStream(v_configure_url))
+    println(v_configure_url)
+    println(v_config.getProperty("username"))
+    println(v_config.getProperty("password"))
+  }
+}
+//#-------------------------------------------------
+//#时间处理
+//#-------------------------------------------------
+import java.sql.Date
+import java.text.SimpleDateFormat
+object Other {
+  def main(args: Array[String]): Unit = {
+    val v_now = System.currentTimeMillis()
+    val v_sdf : SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss")
+    val v_date : String = v_sdf.format(new Date(v_now))
+    println(v_now)
+    println(new Date(v_now))
+    println(v_date)
+  }
+}
+//#-------------------------------------------------
+//#日期处理
+//#-------------------------------------------------
+import java.util.Calendar
+object Other {
+  def main(args: Array[String]): Unit = {
+    val v_now = Calendar.getInstance()
+    println(v_now)
+    println(v_now.get(Calendar.ERA))
+    println(v_now.get(Calendar.YEAR))
+    println(v_now.get(Calendar.MONTH))
+    println(v_now.get(Calendar.WEEK_OF_YEAR))
+    println(v_now.get(Calendar.WEEK_OF_MONTH))
+    println(v_now.get(Calendar.DAY_OF_MONTH))
+    println(v_now.get(Calendar.DAY_OF_YEAR))
+    println(v_now.get(Calendar.DAY_OF_WEEK))
+    println(v_now.get(Calendar.DAY_OF_WEEK_IN_MONTH))
+    println(v_now.get(Calendar.AM_PM))
+    println(v_now.get(Calendar.HOUR))
+    println(v_now.get(Calendar.HOUR_OF_DAY))
+    println(v_now.get(Calendar.MINUTE))
+    println(v_now.get(Calendar.SECOND))
+    println(v_now.get(Calendar.MILLISECOND))
+    println(v_now.get(Calendar.ZONE_OFFSET))
+    println(v_now.get(Calendar.DST_OFFSET))
+  }
+}
+
+
+
+
