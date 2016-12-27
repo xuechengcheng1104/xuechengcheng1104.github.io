@@ -1,0 +1,68 @@
+﻿
+<!--#--------------------------------------------------->
+<!--#验证workflow.xml-->
+<!--#--------------------------------------------------->
+oozie validate /path/to/workflow.xml
+<!--#--------------------------------------------------->
+<!--#oozie配置shell脚本action-->
+<!--#--------------------------------------------------->
+<action name="export_workday_table" retry-max="2" retry-interval="1">
+	<shell xmlns="uri:oozie:shell-action:0.2">
+		<job-tracker>${jobtracker_address}</job-tracker>
+		<name-node>${namenode_address}</name-node>
+		<prepare>
+			<delete path="${monitor_table_status_path}/ORDER_DETAIL/${monitor_date}"/>
+		</prepare>
+		<configuration>
+			<property>
+				<name>mapred.job.queue.name</name>
+				<value>${mapred_job_queue_name</value>
+			</property>
+		</configuration>
+		<exec>export_workday_table.sh</exec>
+		<argument>${argumentname_defined}</argument>
+		<file>shell/export_workday_table.sh#export_workday_table.sh</file>
+	</shell>
+	<ok to="monitor_WORKDAY_TABLE" />
+	<error to="fail" />
+</action>
+<!--#--------------------------------------------------->
+<!--#oozie配置fs文件action-->
+<!--#--------------------------------------------------->
+<action name="monitor_WORKDAY_TABLE">
+	<fs>
+		<mkdir path="${monitor_table_status_path}/WORKDAY_ABLE/${monitor_date}" />
+	</fs>
+	<ok to="end" />
+	<error to="fail" />
+</action>
+<!--#--------------------------------------------------->
+<!--#oozie首尾配置-->
+<!--#--------------------------------------------------->
+<workflow-app xmlns="uri:oozie:workflow:0.3" name="xt-cfb-ods-8-wf">
+	<start to="import_workday_table"/>
+	...
+	<kill name="fail">
+		<message>xt-cfb-ods-8-cd-synochronized workflow failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+	<end name="end" />
+</workflow-app>
+<!--#--------------------------------------------------->
+<!--#oozie 并发action-->
+<!--#--------------------------------------------------->
+<fork name="forkSubWorkflows">
+	<path start="decision1" />
+	<path start="decision2" />
+</fork>
+<join name="end_join" to="create_run_status_path" />
+<!--#--------------------------------------------------->
+<!--#oozie action先决条件-->
+<!--#--------------------------------------------------->
+<decision name="decision1">
+	<switch>
+		<case to "end_join">
+			${fs:isDir(concat("/apps-data/hduser0301/table_status/UM_RISK_PRO_OUTOF/", nominalformateDate))}
+		</case>
+		<default to="UM_RISK_PRO_OUTOF" />
+	</switch>
+</decision>

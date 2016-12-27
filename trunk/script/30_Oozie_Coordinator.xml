@@ -1,0 +1,58 @@
+﻿
+<!--#--------------------------------------------------->
+<!--#oozie协调器首尾配置-->
+<!--#--------------------------------------------------->
+<coordinator-app name="xt_cfbdm_l_d_011_cd"
+	frequency="${coord:days(1)}"
+	start="${job_start}" end="${job_end}" timezone="GMT+08:00" 
+	xmlns="uri:oozie:coordinator:0.2">
+	<contrls>
+		<concurrency>1</concurrency>
+	</contrls>
+	...
+</coordinator-app>
+<!--#--------------------------------------------------->
+<!--#oozie协调器配置依赖-->
+<!--#--------------------------------------------------->
+<datasets>
+	<dataset name="input1_data" 
+		frequency="${coord:days(1)}"
+		initial-instance="${job_start}" timezone="GMT+08:00">
+		<uri-template>${namenode_address}/apps-data/hduser0301/xt_cfbdm_o_l/L_PROD_CURR_PROD/l_${YEAR}-${MONTH}-${DAY}/</uri-template>
+		<done-flag></done-flag>
+	</dataset>
+</datasets>
+<input-events>
+	<data-in name="input1" dataset="input1_data">
+		<instance>${coord:current(0)</instance>
+	</data-in>
+</input-events>
+<!--#--------------------------------------------------->
+<!--#oozie协调器触发workflow-->
+<!--#--------------------------------------------------->
+<action>
+	<workflow>
+		<app-path>${application_path}</app-path>
+		<configuration>
+			<property>
+				<name>nominalformatDate</name>
+				<value>${coord:formatTime(coord:nominalTime(), "yyyy-MM-dd")}</value>
+			</property>
+		</configuration>
+	</workflow>
+</action>
+<!--#--------------------------------------------------->
+<!--#oozie参数配置文件-->
+<!--#--------------------------------------------------->
+namenode_address=hdfs://CNSH041566.app.paic.com.cn:9000
+jobtracker_address=CNSH041566.app.paic.com.cn:9001
+mapred_job_queue_name=queue_0301_01
+
+trapp_db_jdbc=10.31.22.40:1543:t0trapp
+trapp_db_username=pub_test
+trapp_db_password=ntstms2015
+
+job_start=2016-02-26T06:00+0800
+job_end=2999-12-31T23:59+0800
+
+application_path=${namenode_address}/app/hduser0301/xt_cfbdm_l_d/xt_cfbdm_l_d_011_cd

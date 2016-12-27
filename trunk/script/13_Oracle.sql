@@ -1,47 +1,71 @@
 ﻿
-#-------------------------------------------------
-#    取前10条数据
-#-------------------------------------------------
+--**************************************************
+--*    查看某用户对表/系统的权限
+--**************************************************
+select * from user_sys_privs;
+select * from all_tab_privs;
+--**************************************************
+--*    列出schema与table信息
+--**************************************************
+select owner
+	,count(*)
+from all_tables
+group by owner
+order by owner
+;
+--**************************************************
+--*    日期类型字段和日期参数比较
+--**************************************************
+select sysdate
+	,trunc(sysdate)
+	,trunc(sysdate,'dd')
+	,date'2016-12-23'
+	,case when trunc(sysdate,'dd')=date'2016-12-13' then '1' else '0' end
+from dual
+;
+--**************************************************
+--*    取前10条数据
+--**************************************************
 select * from table where rownum<11
-#-------------------------------------------------
-#    查看磁盘使用情况
-#-------------------------------------------------
+--**************************************************
+--*    查看磁盘使用情况
+--**************************************************
 select sum(bytes)/1024/1024/1024 from dba_segments where owner not in ('SYS', 'SYSTEM');
-#-------------------------------------------------
-#    oracle 插入日期值（DATE）
-#-------------------------------------------------
+--**************************************************
+--*    oracle 插入日期值（DATE）
+--**************************************************
 insert into cfbic.circle_product_info
 (id, product_group_id, date_updated)
 values
 ('1', 'milk', to_date('2016-10-26 12:00:00', 'yyyy-mm-dd hh24:mi:ss'))	--mysql insert characters string directly
-#-------------------------------------------------
-#    oracle 表名,字段名，区分大小写
-#-------------------------------------------------
+--**************************************************
+--*    oracle 表名,字段名，区分大小写
+--**************************************************
 select * from all_tables where lower(table_name) like '%circle_info%';
 SELECT ID FROM CFBIC.CIRCLE_INFO; --sqoop导数要使用大写
-#-------------------------------------------------
-#    pl/sql developer 首选项
-#-------------------------------------------------
+--**************************************************
+--*    pl/sql developer 首选项
+--**************************************************
 下载安装包instantclient-basic-nt-11.2.0.2.0.zip ， 解压到任意目录
 tool / preferences / connection / 
 set ORACLE_HOME=D:\app\Matt\product\11.2.0\dbhome_1 
 set OCI Libiary=D:\app\Matt\product\11.2.0\instantclient_11_2\oci.dll
 edit D:\app\Matt\product\11.2.0\dbhome_1\network\admin\tnsnames.ora
-#-------------------------------------------------
-#    Oracle 两个用户同事操作数据，相互看到的数据不一致
-#-------------------------------------------------
+--**************************************************
+--*    Oracle 两个用户同事操作数据，相互看到的数据不一致
+--**************************************************
 用户做完更新后，要commit完成数据提交。
-#-------------------------------------------------
-#    Oracle installation
-#-------------------------------------------------
+--**************************************************
+--*    Oracle installation
+--**************************************************
 Question 1, 先决条件检查，环境变量PATH实际长度超过期望值
 解决方法：删除以D开头的PATH环境变量，退出安装程序，重新安装。原PATH环境变量如下
 %CATALINA_HOME%\bin;%JAVA_HOME%\bin;%JAVA_HOME%\jre\bin;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;D:\Program Files\Microsoft SQL Server\110\DTS\Binn\;D:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn\;D:\Program Files\Microsoft SQL Server\110\Tools\Binn\;D:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn\ManagementStudio\;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PrivateAssemblies\;D:\Program Files (x86)\Microsoft SQL Server\110\DTS\Binn\;d:\Program Files (x86)\IDM Computer Solutions\UltraEdit;D:\Program Files\Calibre2\
 Item 2, 数据库管理URL
 https://localhost:1158/em
-#-------------------------------------------------
-#    Dictionary
-#-------------------------------------------------
+--**************************************************
+--*    Dictionary
+--**************************************************
 DICTIONARY
 ALL_USERS
 ALL_OBJECTS
@@ -49,18 +73,18 @@ ALL_TABLES
 ALL_VIEWS
 ALL_PROCEDURES
 ALL_TAB_COLUMNS
-#-------------------------------------------------
-#    USER
-#-------------------------------------------------
+--**************************************************
+--*    USER
+--**************************************************
 CREATE USER user161009 IDENTIFIED BY user123456;
 GRANT CREATE SESSION TO user161009;
 GRANT ALTER ON plants TO scott;
 REVOKE ALTER ON plants FROM scott;
 ALTER USER HR ACCOUNT UNLOCK;	--unlock one account
 ALTER USER HR IDENTIFIED BY HR123456;	--change the password of one account
-#-------------------------------------------------
-#    TABLE
-#-------------------------------------------------
+--**************************************************
+--*    TABLE
+--**************************************************
 CREATE TABLE test_table ( col1 INTEGER, col2 INTEGER );
 CREATE TABLE products ( prod_id INT, count INT INVISIBLE );
 CREATE TABLE employees
@@ -142,9 +166,9 @@ INSERT INTO plants VALUES
 (2, 'Amaryllis');
 RENAME TABLE01 to TABLE02;
 DROP TABLE plants;
-#-------------------------------------------------
-#    PROCEDURE
-#-------------------------------------------------
+--**************************************************
+--*    PROCEDURE
+--**************************************************
 CREATE OR REPLACE PROCEDURE test_proc
 AS
 BEGIN
@@ -155,9 +179,9 @@ BEGIN
  END LOOP;
 END;
 EXECUTE test_proc;
-#-------------------------------------------------
-#    INDEX
-#-------------------------------------------------
+--**************************************************
+--*    INDEX
+--**************************************************
 CREATE INDEX ord_customer_ix ON orders (customer_id);
 CREATE INDEX emp_name_dpt_ix ON hr.employees
 (
@@ -168,9 +192,9 @@ CREATE BITMAP INDEX employees_bm_idx ON employees (jobs.job_title)
 FROM employees, jobs 
 WHERE employees.job_id = jobs.job_id;
 CREATE INDEX emp_fname_uppercase_idx ON employees(UPPER(first_name));
-#-------------------------------------------------
-#    VIEW
-#-------------------------------------------------
+--**************************************************
+--*    VIEW
+--**************************************************
 CREATE VIEW staff AS
 SELECT employee_id,
   last_name,
@@ -178,37 +202,37 @@ SELECT employee_id,
   manager_id,
   department_id
 FROM employees;
-#-------------------------------------------------
-#    SEQUENCE
-#-------------------------------------------------
+--**************************************************
+--*    SEQUENCE
+--**************************************************
 CREATE SEQUENCE customers_seq 
 	START WITH 1000 INCREMENT BY 1 
 NOCACHE 
 NOCYCLE;
 CREATE SYNONYM EMPL FOR EMPLOYEES;
-#-------------------------------------------------
-#    Transaction control
-#-------------------------------------------------
+--**************************************************
+--*    Transaction control
+--**************************************************
 SET TRANSACTION NAME 'Update salaries';
 SAVEPOINT before_salary_update;
 UPDATE employees SET salary =9100 WHERE employee_id=1234;
 ROLLBACK TO SAVEPOINT before_salary_update;
 UPDATE employees SET salary =9200 WHERE employee_id=1234;
 COMMIT COMMENT 'Updated salaries';
-#-------------------------------------------------
-#    Session control
-#-------------------------------------------------
+--**************************************************
+--*    Session control
+--**************************************************
 SET ROLE NONE;
 ALTER SESSION
 SET NLS_DATE_FORMAT = 'YYYY MM DD HH24:MI:SS';
-#-------------------------------------------------
-#    System control
-#-------------------------------------------------
+--**************************************************
+--*    System control
+--**************************************************
 ALTER SYSTEM SWITCH LOGFILE;
 ALTER SYSTEM KILL SESSION '39, 23';
-#-------------------------------------------------
-#    Trigger
-#-------------------------------------------------
+--**************************************************
+--*    Trigger
+--**************************************************
 CREATE OR REPLACE TRIGGER lineitems_trigger AFTER
   INSERT OR
   UPDATE OR
@@ -226,17 +250,17 @@ IF (DELETING OR UPDATING) THEN
   WHERE order_id       = :old.order_id;
 END IF;
 END;
-#-------------------------------------------------
-#    SQLPlus
-#-------------------------------------------------
+--**************************************************
+--*    SQLPlus
+--**************************************************
 COLUMN OBJECT_NAME FORMAT A25;
-#-------------------------------------------------
-#    模糊查询
-#-------------------------------------------------
+--**************************************************
+--*    模糊查询
+--**************************************************
 --SELECT * FROM DICTIONARY WHERE TABLE_NAME LIKE 'DBA\_%' ESCAPE '\';
-#-------------------------------------------------
-#    常用函数
-#-------------------------------------------------
+--**************************************************
+--*    常用函数
+--**************************************************
 SQL> select ascii(A) A,ascii(a) a,ascii(0) zero,ascii( ) space from dual;
 SQL> select chr(54740) zhao,chr(65) chr65 from dual;
 SQL> select concat(010-,88888888)||转23 高乾竞电话 from dual;

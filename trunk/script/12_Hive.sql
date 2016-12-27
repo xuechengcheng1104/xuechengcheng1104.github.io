@@ -1,5 +1,74 @@
 ﻿
 --#-------------------------------------------------
+--#    hive 脚本规范走查
+--#-------------------------------------------------
+1. 程序头的参数：无直接写死变量
+2. 语句结束符：另起一行，只有";"符号
+3. 脚本文件编码及换行符：Unix 编码，utf-8格式
+4. 库名使用：注意${hivevar:sourcedbname}和${hivevar:targetdbname}的使用
+5. 临时表命名：脚本名加 "_vt1", "_vt2"
+6. 时间字段处理：注意date 和 timestamp的使用
+7. 数值相加：多个字段相加都要加上nvl(columnname,0)进行处理。
+8. 特殊值处理：注意null，''的区别
+9. 数据获取：先过滤，再关联
+10.分区字段使用：必须使用分区字段进行过滤
+11.数据清洗：trim()去除首尾空格
+--#-------------------------------------------------
+--#    "*","%" in the like clause
+--#-------------------------------------------------
+use xt_cfbdm_safe;
+show tables like 'l_cust_basic*';
+select *
+from xt_trapp_safe.userexperiencefeedbackto_tmp t
+where get_json_object(t.json_line,'$.comment') like '%第%';
+--#-------------------------------------------------
+--#    how to sort by expression used in group by clause
+--#-------------------------------------------------
+select to_date(nps_time) as column_name
+  ,count(*)
+from liyunfeng944_ind.temp_nps_result_lbs
+where dt='2016-12-07'
+group by to_date(nps_time)
+order by column_name desc;
+--#-------------------------------------------------
+--#    timestamp类型截取
+--#-------------------------------------------------
+concat('cfb',t1.umno
+  ,substr(t1.nps_time,1,4)
+  ,substr(t1.nps_time,6,2)
+  ,substr(t1.nps_time,9,2)
+  ,substr(t1.nps_time,12,2)
+  ,substr(t1.nps_time,15,2)
+  ,substr(t1.nps_time,18,2)
+) as lbs_id
+--#-------------------------------------------------
+--#    hivesql error
+--#-------------------------------------------------
+FAILED: NullPointerException null
+check if missing "," in the select clause.
+--#-------------------------------------------------
+--#    hive -e
+--#-------------------------------------------------
+./temp_nps_result_lps.sh queue02 20161207 1031102130 2016-12-07
+vim temp_nps_result_lps.sh
+  txdate=$4
+  hive -e "alter table temp_nps_result_lps drop if exists partition (dt='$txdate');"
+--#-------------------------------------------------
+--#    hive -f
+--#-------------------------------------------------
+hive -hiveconf mapred.Job.queue.name=queue02 -hivevar txdate=2016-04-16 -f l_cust_basic_info.q
+--#-------------------------------------------------
+--#    truncate and overwrite
+--#-------------------------------------------------
+insert overwrite table adminproductinfo
+--#-------------------------------------------------
+--#    向分区插入数据
+--#-------------------------------------------------
+alter table temp_nps_result_lbs drop partition (dt='${hive:var:txdate}');
+insert into table ${hivevar:targetdbname}.temp_nps_result_lbs partition (dt='${hivevar:txdate}')
+...
+;
+--#-------------------------------------------------
 --#    建表语句
 --#-------------------------------------------------
 use xt_trapp_safe;
@@ -30,6 +99,7 @@ describe formatted xt_cfbdm_safe.l_cust_basic_info partition (elt_dt=date'2016-1
 --#    解析json字段
 --#-------------------------------------------------
 select get_json_object(t.json_line, '$.jsoncolumnname.publishInfo.appProductUnderTime') from tablename t; --json数据不可以出现ISOData()这样的函数
+regexp_replace(substr(get_json_object(t.json_line,'$.dateCreated'), 11, 19),'T',' ')
 --#-------------------------------------------------
 --#    删除字段
 --#-------------------------------------------------
@@ -71,15 +141,17 @@ create table customer_temp like customer;
 insert overwrite table customer
 select * from customer_temp
 union all
-select a.* 
+select a.*
 from customer a
 left outer join customer_temp b
-	on a.id = b.id 
+	on a.id = b.id
 where b.id is null
 --#-------------------------------------------------
 --#    hive 变量
 --#-------------------------------------------------
-set hivevar:txdate=2016-10-24
+set hivevar:sourcedbname=xt_cfbdm_safe;
+set hivevar:txdate=2016-10-24;
+use ${hivevar:sourcedbname};
 --#-------------------------------------------------
 --#    hive 数据类型
 --#-------------------------------------------------
@@ -132,7 +204,7 @@ Step 04:  将列表连接成一个字符串
 --#-------------------------------------------------
 --#    DATABASE
 --#-------------------------------------------------
-CREATE DATABASE IF NOT EXISTS test03 
+CREATE DATABASE IF NOT EXISTS test03
 COMMENT 'Holds all financial tables'
 LOCATION '/user/xcc/warehouse/test01.db'
 WITH DBPROPERTIES ('creator' = 'Mark Moneybags', 'date' = '2012-01-02');
@@ -141,16 +213,16 @@ DROP DATABASE IF EXISTS xt_cfbdm_safe CASCADE;
 --#-------------------------------------------------
 --#    TABLE
 --#-------------------------------------------------
-hv> CREATE EXTERNAL TABLE IF NOT EXISTS weblog 
+hv> CREATE EXTERNAL TABLE IF NOT EXISTS weblog
 	(
-		user_id INT, 
-		url STRING COMMENT 'the path to archive resource', 
+		user_id INT,
+		url STRING COMMENT 'the path to archive resource',
 		source_ip STRING
 	)
 	COMMENT 'the log file of web'
 	PARTITIONED BY (dt STRING)
 	CLUSTERED BY (user_id) SORTED BY (user_id ASC) INTO 96 BUCKETS
-	ROW FORMAT DELIMITED 
+	ROW FORMAT DELIMITED
 		FIELDS TERMINATED BY '\t'
 		LINES TERMINATED BY '\n'
 	STORED AS TEXTFILE
@@ -161,9 +233,9 @@ hv> ALTER TABLE xt_cfbdm_safe.employee_partition ADD IF NOT EXISTS
 	    PARTITION (country='CHINA', state='ShangHai') LOCATION '/logs/2011/01/02'
 	    PARTITION (country='CHINA', state='BeiJing') LOCATION '/logs/2011/01/03';
 hv> ALTER TABLE employees06 RENAME TO employees07;
-hv> ALTER TABLE employees07 CHANGE COLUMN name 
+hv> ALTER TABLE employees07 CHANGE COLUMN name
 		firstname int COMMENT 'the first part of name';
-hv> ALTER TABLE employees07 ADD COLUMNS 
+hv> ALTER TABLE employees07 ADD COLUMNS
 	(
 	    name STRING COMMENT 'Application name'
 	);
@@ -171,12 +243,12 @@ hv> ALTER TABLE employees07 REPLACE COLUMNS (
 	    name STRING COMMENT 'Employee name',
 	    salary FLOAT COMMENT 'Employee salary'
 	);
-hv> insert into employees04 partition (country='CHINA', state='HK') 
+hv> insert into employees04 partition (country='CHINA', state='HK')
 	select 'lisi', '13.3';
 	--'use dbname' first, before excute this statment
-hv> insert overwrite table employees 
-	select name, salary 
-	from employees07 
+hv> insert overwrite table employees
+	select name, salary
+	from employees07
 	where country='CHINA' and state='HK';
 hv> FROM employees07
     INSERT OVERWRITE TABLE employees08 PARTITION (dt='2009-02-25')
@@ -184,8 +256,8 @@ hv> FROM employees07
     WHERE country='CHINA' and state='HK';
 hv> truncate table employees04;
 hv> DROP TABLE IF EXISTS employees;
-	--the expressions occuring in group by clause must be in the select clause too 
-hv> group by expressions	
+	--the expressions occuring in group by clause must be in the select clause too
+hv> group by expressions
 --#-------------------------------------------------
 --#    Special question
 --#-------------------------------------------------
@@ -223,8 +295,8 @@ hive> create table lxw_dual as select 5.6 – 4 from lxw_dual;
 hive> describe lxw_dual;
 hive> select 40 * 5 from lxw_dual;
 hive> select 40 / 5 from lxw_dual;
-hive> select ceil(28.0/6.999999999999999999999) from lxw_dual limit 1;   
-hive> select ceil(28.0/6.99999999999999) from lxw_dual limit 1;          
+hive> select ceil(28.0/6.999999999999999999999) from lxw_dual limit 1;
+hive> select ceil(28.0/6.99999999999999) from lxw_dual limit 1;
 hive> select 41 % 5 from lxw_dual;
 hive> select 8.4 % 4 from lxw_dual;
 hive> select round(8.4 % 4 , 2) from lxw_dual;
