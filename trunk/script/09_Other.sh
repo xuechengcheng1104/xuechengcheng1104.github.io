@@ -1,5 +1,37 @@
 ﻿
 #-------------------------------------------------
+#    训练数据集
+#-------------------------------------------------
+国内数据	http://pan.baidu.com/s/1i5nyjBn	26bm
+好玩的数据集	http://pan.baidu.com/s/1bSDIEi	25zr
+微软数据	http://pan.baidu.com/s/1bpmo6uV	286q
+微博数据集	http://pan.baidu.com/s/1jHCOwCI	x58f
+遥感影像库	http://pan.baidu.com/s/1dF63kDr	7tnh
+1990-2016年股票数据	http://pan.baidu.com/s/1i44IQ3N	o9hj
+各大企业电话邮箱创立时间	http://pan.baidu.com/s/1i5PXPCp	m4mo
+98-09年经济普查	http://pan.baidu.com/s/1o8wbzsu	a093
+各国各产业资产数据	http://pan.baidu.com/s/1jI19qmi	on7y
+1953-2013统计年鉴	http://pan.baidu.com/s/1mh5sHuC	7ije
+2015全国人口普查	http://pan.baidu.com/s/1i5mIj6t	yad1
+facebook大数据	http://pan.baidu.com/s/1jHRb3Wq	aezb
+taiwind数据	http://pan.baidu.com/s/1kV8YKXh	984g
+全球社交媒体	http://pan.baidu.com/s/1qXXAQvU	c8qc
+京东2015自营	http://pan.baidu.com/s/1i56uYFz	oj4v
+维基百科数据	http://pan.baidu.com/s/1c2gMLUw	4f3b
+kaggle竞赛数据	http://pan.baidu.com/s/1pLDAx6N	i10y
+生物数据	http://pan.baidu.com/s/1pLLHQwr	zfjs
+nasa数据	http://pan.baidu.com/s/1i50pw49	aawf
+基因组数据	http://pan.baidu.com/s/1pLTPwtP	vgs8
+新闻数据	http://pan.baidu.com/s/1hsHSyzE	pey9
+ImageNet数据	http://pan.baidu.com/s/1bpIcTAn	tejk
+百肚数据	http://pan.baidu.com/s/1hsr4ayg	k76p
+图像数据	http://pan.baidu.com/s/1jHW1kAa	qztt
+google数据	http://pan.baidu.com/s/1bpsugGn	8bt4
+分类练习数据	http://pan.baidu.com/s/1pLuD3wJ	4pxf
+各大联赛世界杯数据	http://pan.baidu.com/s/1jIO9TR4	1v1q
+自动驾驶数据	http://pan.baidu.com/s/1miFcv5e	y7uj
+
+#-------------------------------------------------
 #    公司wlan sunline密码
 #-------------------------------------------------
 sun300348

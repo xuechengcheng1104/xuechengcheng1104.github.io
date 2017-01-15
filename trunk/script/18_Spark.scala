@@ -1,5 +1,193 @@
 ﻿
 //**************************************************
+//*Spark RDD - basic
+//**************************************************
+scala> val acTransList = Array("SB10001,1000","SB10002,1200","SB10003,8000","SB10004,400","SB10005,300","SB10006,10000","SB10007,500","SB10008,56","SB10009,30","SB10010,7000","CR10001,7000","SB10002,-10")
+scala> val acTransRDD = sc.parallelize(acTransList)
+scala> val goodTransRecords = acTransRDD.filter(_.split(",")(1).toDouble > 0).filter(_.split(",")(0).startsWith("SB"))
+scala> val highValueTransRecords = goodTransRecords.filter(_.split(",")(1).toDouble>1000)
+scala> val badAmountLambda = (trans : String) => trans.split(",")(1).toDouble <= 0
+scala> val badAcNoLambda = (trans : String) => trans.split(",")(0).startsWith("SB") == false
+scala> val badAmountRecords = acTransRDD.filter(badAmountLambda)
+scala> val badAccountRecords = acTransRDD.filter(badAcNoLambda)
+scala> val badTransRecords=badAmountRecords.union(badAccountRecords)
+scala> acTransRDD.collect()
+scala> goodTransRecords.collect()
+scala> highValueTransRecords.collect()
+scala> badAccountRecords.collect()
+scala> badAmountRecords.collect()
+scala> badTransRecords.collect()
+scala> val sumAmount = goodTransRecords.map(trans => trans.split(",")(1).toDouble).reduce(_+_)
+scala> val maxAmount = goodTransRecords.map(trans => trans.split(",")(1).toDouble).reduce((a,b) => if (a>b) a else b)
+scala> val minAmount = goodTransRecords.map(trans => trans.split(",")(1).toDouble).reduce((a,b) => if (a<b) a else b)
+scala> val combineAllElements = acTransRDD.flatMap(trans=>trans.split(","))
+scala> val allGoodAccountNos = combineAllElements.filter(_.startsWith("SB"))
+scala> combineAllElements.collect()
+scala> allGoodAccountNos.distinct().collect()
+//**************************************************
+//*Spark RDD - key-value
+//**************************************************
+scala> val acTransList = Array("SB10001,1000","SB10002,1200","SB10001,8000","SB10002,400","SB10003,300","SB10001,10000","SB10004,500","SB10005,56","SB10003,30","SB10002,7000","SB10001,-100","SB10002,-10")
+scala> val acTransRDD = sc.parallelize(acTransList)
+scala> val acKeyVal = acTransRDD.map(trans => (trans.split(",")(0), trans.split(",")(1).toDouble))
+scala> val accSummary = acKeyVal.reduceByKey(_+_).sortByKey()
+scala> accSummary.collect()
+//**************************************************
+//*Spark RDD - join
+//**************************************************
+scala> val acMasterList = Array("SB10001,Roger,Federer","SB10002,Pete,Sampras","SB10003,Rafael,Nadal","SB10004,Boris,Becker","SB10005,Ivan,Lendl")
+scala> val acBalList = Array("SB10001,50000","SB10002,12000","SB10003,3000","SB10004,8500","SB10005,5000")
+scala> val acMasterRDD = sc.parallelize(acMasterList)
+scala> val acBalRDD = sc.parallelize(acBalList)
+scala> val acMasterTuples = acMasterRDD.map(master => master.split(",")).map(masterList => (masterList(0), masterList(1)+" "+masterList(2)))
+scala> val acBalTuples = acBalRDD.map(trans => trans.split(",")).map(transList => (transList(0), transList(1)))
+scala> val acJoinTuples = acMasterTuples.join(acBalTuples).sortByKey().map{case(accno, (name, amount)) => (accno, name, amount)}
+scala> acJoinTuples.collect()
+scala> val acNameAndBalance = acJoinTuples.map{case(accno, name, amount) => (name,amount)}
+scala> val acTuplesByAmount = acBalTuples.map{case(accno, amount) => (amount.toDouble, accno)}.sortByKey(false)
+scala> acTuplesByAmount.first()
+scala> acTuplesByAmount.take(3)
+scala> acBalTuples.countByKey()
+scala> acBalTuples.count()
+scala> acNameAndBalance.foreach(println)
+scala> val balanceTotal = sc.accumulator(0.0, "AccountBalanceTotal")
+scala> acBalTuples.map{case(accno, amount) => amount.toDouble}.foreach(bal => balanceTotal += bal)
+scala> balanceTotal.value
+//**************************************************
+//*Spark SQL - SQL
+//**************************************************
+scala> case class Trans(accNo: String, tranAmount: Double)
+scala> def toTrans = (trans: Seq[String]) => Trans(trans(0), trans(1).trim.toDouble)
+scala> val acTransList = Array("SB10001,1000", "SB10002,1200","SB10003,8000", "SB10004,400", "SB10005,300", "SB10006,10000","SB10007,500", "SB10008,56", "SB10009,30","SB10010,7000", "CR10001,7000","SB10002,-10")
+scala> val acTransRDD =sc.parallelize(acTransList).map(_.split(",")).map(toTrans(_))
+scala> val acTransDF = spark.createDataFrame(acTransRDD)
+scala> acTransDF.createOrReplaceTempView("trans")
+scala> acTransDF.printSchema
+scala> acTransDF.show
+scala> val goodTransRecords = spark.sql("SELECT accNo, tranAmount FROM trans WHERE accNo like 'SB%' AND tranAmount > 0")
+scala> goodTransRecords.createOrReplaceTempView("goodtrans")
+scala> goodTransRecords.show
+scala> val highValueTransRecords = spark.sql("SELECT accNo, tranAmount FROM goodtrans WHERE tranAmount > 1000")
+scala> highValueTransRecords.show
+scala> val badAccountRecords = spark.sql("SELECT accNo, tranAmount FROM trans WHERE accNo NOT like 'SB%'")
+scala> badAccountRecords.show
+scala> val badAmountRecords = spark.sql("SELECT accNo, tranAmount FROM trans WHERE tranAmount < 0")
+scala> badAmountRecords.show
+scala> val badTransRecords = badAccountRecords.union(badAmountRecords)
+scala> badTransRecords.show
+scala> val sumAmount = spark.sql("SELECT sum(tranAmount) as sum FROM goodtrans")
+scala> sumAmount.show
+scala> val maxAmount = spark.sql("SELECT max(tranAmount) as max FROM goodtrans")
+scala> maxAmount.show
+scala> val minAmount = spark.sql("SELECT min(tranAmount) as min FROM goodtrans")
+scala> minAmount.show
+scala> val goodAccNos = spark.sql("SELECT DISTINCT accNo FROM trans WHERE accNo like 'SB%' ORDER BY accNo")
+scala> goodAccNos.show
+scala> val sumAmountByMixing = goodTransRecords.map(trans => trans.getAs[Double]("tranAmount")).reduce(_ + _)
+scala> val maxAmountByMixing = goodTransRecords.map(trans => trans.getAs[Double]("tranAmount")).reduce((a, b) => if (a > b) a else b)
+scala> val minAmountByMixing = goodTransRecords.map(trans => trans.getAs[Double]("tranAmount")).reduce((a, b) => if (a < b) a else b)
+//**************************************************
+//*Spark SQL - API
+//**************************************************
+scala> acTransDF.show
+scala> val goodTransRecords = acTransDF.filter("accNo like 'SB%'").filter("tranAmount > 0")
+scala> goodTransRecords.show
+scala> val highValueTransRecords = goodTransRecords.filter("tranAmount > 1000")
+scala> highValueTransRecords.show
+scala> val badAccountRecords = acTransDF.filter("accNo NOT like 'SB%'")
+scala> badAccountRecords.show
+scala> val badAmountRecords = acTransDF.filter("tranAmount < 0")
+scala> badAmountRecords.show
+scala> val badTransRecords = badAccountRecords.union(badAmountRecords)
+scala> badTransRecords.show
+scala> val aggregates = goodTransRecords.agg(sum("tranAmount"), max("tranAmount"), min("tranAmount"))
+scala> aggregates.show
+scala> val goodAccNos = acTransDF.filter("accNo like 'SB%'").select("accNo").distinct().orderBy("accNo")
+scala> goodAccNos.show
+scala> acTransDF.write.parquet("scala.trans.parquet")
+scala> val acTransDFfromParquet = spark.read.parquet("scala.trans.parquet")
+scala> acTransDFfromParquet.show
+//**************************************************
+//*Spark SQL - aggreation
+//**************************************************
+scala> case class Trans(accNo: String, tranAmount: Double)
+scala> def toTrans = (trans: Seq[String]) => Trans(trans(0), trans(1).trim.toDouble)
+scala> val acTransList = Array("SB10001,1000","SB10002,1200","SB10001,8000", "SB10002,400", "SB10003,300","SB10001,10000","SB10004,500","SB10005,56","SB10003,30","SB10002,7000","SB10001,-100", "SB10002,-10")
+scala> val acTransDF = sc.parallelize(acTransList).map(_.split(",")).map(toTrans(_)).toDF()
+scala> acTransDF.show
+scala> acTransDF.createOrReplaceTempView("trans")
+scala> val acSummary = spark.sql("SELECT accNo, sum(tranAmount) as TransTotal FROM trans GROUP BY accNo")
+scala> acSummary.show
+scala> val acSummaryViaDFAPI = acTransDF.groupBy("accNo").agg(sum("tranAmount") as "TransTotal")
+scala> acSummaryViaDFAPI.show
+//**************************************************
+//*Spark SQL - join
+//**************************************************
+scala> case class AcMaster(accNo: String, firstName: String, lastName: String)
+scala> case class AcBal(accNo: String, balanceAmount: Double)
+scala> def toAcMaster = (master: Seq[String]) => AcMaster(master(0), master(1), master(2))
+scala> def toAcBal = (bal: Seq[String]) => AcBal(bal(0), bal(1).trim.toDouble)
+scala> val acMasterList =Array("SB10001,Roger,Federer","SB10002,Pete,Sampras","SB10003,Rafael,Nadal","SB10004,Boris,Becker", "SB10005,Ivan,Lendl")
+scala> val acBalList = Array("SB10001,50000","SB10002,12000","SB10003,3000", "SB10004,8500", "SB10005,5000")
+scala> val acMasterDF = sc.parallelize(acMasterList).map(_.split(",")).map(toAcMaster(_)).toDF()
+scala> val acBalDF = sc.parallelize(acBalList).map(_.split(",")).map(toAcBal(_)).toDF()
+scala> acMasterDF.write.parquet("scala.master.parquet")
+scala> acBalDF.write.json("scalaMaster.json")
+scala> val acMasterDFFromFile = spark.read.parquet("scala.master.parquet")
+scala> acMasterDFFromFile.createOrReplaceTempView("master")
+scala> val acBalDFFromFile = spark.read.json("scalaMaster.json")
+scala> acBalDFFromFile.createOrReplaceTempView("balance")
+scala> acMasterDFFromFile.show
+scala> acBalDFFromFile.show
+scala> val acDetail = spark.sql("SELECT master.accNo, firstName, lastName, balanceAmount FROM master, balance WHERE master.accNo = balance.accNo ORDER BY balanceAmount DESC")
+scala> acDetail.show
+scala> val acDetailFromAPI = acMastterDFFromFile.join(acBalDFFromFile, acMasterDFFromFile("accNo") === acBalDFFromFile("accNo"), "inner").sort($"balanceAmount".desc).select(acMasterDFFromFile("accNo"),acMasterDFFromFile("firstName"), acMasterDFFromFile("lastName"),acBalDFFromFile("balanceAmount"))
+scala> acDetailFromAPI.show
+scala> val acDetailTop3 = spark.sql("SELECT master.accNo, firstName, lastName, balanceAmount FROM master, balance WHERE master.accNo = balance.accNo ORDER BY balanceAmount DESC").limit(3)
+scala> acDetailTop3.show
+//**************************************************
+//*Spark SQL - dataset
+//**************************************************
+scala> case class Trans(accNo: String, tranAmount: Double)
+scala> val acTransList = Seq(Trans("SB10001", 1000), Trans("SB10002",1200),Trans("SB10003", 8000), Trans("SB10004",400), Trans("SB10005",300),Trans("SB10006",10000), Trans("SB10007",500), Trans("SB10008",56),Trans("SB10009",30),Trans("SB10010",7000), Trans("CR10001",7000),Trans("SB10002",-10))
+scala> val acTransDS = acTransList.toDS()
+scala> acTransDS.show()
+scala> val goodTransRecords = acTransDS.filter(_.tranAmount > 0).filter(_.accNo.startsWith("SB"))
+scala> goodTransRecords.show()
+scala> val highValueTransRecords = goodTransRecords.filter(_.tranAmount > 1000)
+scala> highValueTransRecords.show()
+scala> val badAmountLambda = (trans: Trans) => trans.tranAmount <= 0
+scala> val badAcNoLambda = (trans: Trans) => trans.accNo.startsWith("SB") == false
+scala> val badAmountRecords = acTransDS.filter(badAmountLambda)
+scala> badAmountRecords.show()
+scala> val badAccountRecords = acTransDS.filter(badAcNoLambda)
+scala> badAccountRecords.show()
+scala> val badTransRecords = badAmountRecords.union(badAccountRecords)
+scala> badTransRecords.show()
+scala> val sumAmount = goodTransRecords.map(trans => trans.tranAmount).reduce(_ + _)
+scala> val maxAmount = goodTransRecords.map(trans => trans.tranAmount).reduce((a, b) => if (a > b) a else b)
+scala> val minAmount = goodTransRecords.map(trans => trans.tranAmount).reduce((a, b) => if (a < b) a else b)
+scala> val acTransDF = acTransDS.toDF()
+scala> acTransDF.show()
+scala> acTransDF.createOrReplaceTempView("trans")
+scala> val invalidTransactions = spark.sql("SELECT accNo, tranAmount FROM trans WHERE (accNo NOT LIKE 'SB%') OR tranAmount <= 0")
+scala> invalidTransactions.show()
+scala> val acTransRDD = sc.parallelize(acTransList)
+scala> val acTransRDDtoDF = acTransRDD.toDF()
+scala> val acTransDFtoDS = acTransRDDtoDF.as[Trans]
+scala> acTransDFtoDS.show()
+//**************************************************
+//*Spark SQL - catalogs
+//**************************************************
+scala> val catalog = spark.catalog
+scala> val dbList = catalog.listDatabases()
+scala> dbList.select("name", "description", "locationUri").show()
+scala> val tableList = catalog.listTables()
+scala> tableList.show()
+scala> catalog.dropTempView("trans")
+scala> val latestTableList = catalog.listTables()
+scala> latestTableList.show()
+//**************************************************
 //*IDEA spark enviroment setup
 //**************************************************
 //enviroment 1
